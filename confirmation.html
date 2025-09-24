@@ -51,6 +51,20 @@
       color: var(--text-primary);
       font-weight: 400;
     }
+    .actions {
+      text-align: center;
+      padding: 1rem;
+      background: var(--panel-bg);
+    }
+    .actions button {
+      padding: 0.75rem 1.5rem;
+      background: var(--theme);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -73,6 +87,9 @@
          <span class="value" id="total-time">0s</span>
       </p>
     </div>
+    <div class="actions">
+      <button id="finish-btn">Finish & Save</button>
+    </div>
   </div>
 
   <script>
@@ -89,6 +106,39 @@
     const start = parseInt(sessionStorage.getItem('startTime'), 10);
     const totalSec = Math.floor((Date.now() - start) / 1000);
     document.getElementById('total-time').textContent = totalSec + 's';
+
+    // Function to save to groupBResults
+    function saveGroupBResult(userId, timeTaken, success) {
+      const STORAGE_KEY = 'groupBResults';
+      let arr;
+      try {
+        arr = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        if (!Array.isArray(arr)) arr = [];
+      } catch {
+        arr = [];
+      }
+      arr.push({
+        userId,
+        time: timeTaken,
+        attempts: 1,  // 그룹 B 는 시도 횟수가 항상 1
+        success,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    }
+
+    document.getElementById('finish-btn').addEventListener('click', () => {
+      const userId    = localStorage.getItem('buyerIdB') || '';
+      const timeTaken = parseFloat(localStorage.getItem('captchaTime')) || 0;
+      const success   = localStorage.getItem('captchaSuccess') === 'true';
+
+      if (!userId) {
+        alert('Buyer ID not found.');
+        return;
+      }
+      saveGroupBResult(userId, timeTaken, success);
+      alert('Results saved!');
+    });
   </script>
 </body>
 </html>

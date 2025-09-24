@@ -9,6 +9,7 @@
     .form-group { margin-bottom:1rem; }
     .form-group label { display:block; font-size:0.95rem; color:var(--text-secondary); margin-bottom:0.5rem; }
     .form-group input { width:100%; padding:0.75rem; border:1px solid var(--border); border-radius:4px; }
+    .errors { display:none; color:red; margin-top:0.5rem; }
   </style>
 </head>
 <body>
@@ -38,18 +39,39 @@
     </div>
   </div>
   <script>
-    setInterval(()=>document.getElementById('timer').textContent=`Time: ${Math.floor((Date.now()-+sessionStorage.getItem('startTime'))/1000)}s`,1000);
-    document.getElementById('info-next').onclick=()=>{
-      const n=document.getElementById('name').value.trim(),
-            p=document.getElementById('phone').value.trim(),
-            e=document.getElementById('email').value.trim();
-      if(!n||!p||!e) document.getElementById('info-error').style.display='block';
-      else{
-        sessionStorage.setItem('buyerName',n);
-        sessionStorage.setItem('buyerPhone',p);
-        sessionStorage.setItem('buyerEmail',e);
-        location.href='payment.html';
+    setInterval(() => {
+      document.getElementById('timer').textContent = `Time: ${Math.floor((Date.now() - +sessionStorage.getItem('startTime')) / 1000)}s`;
+    }, 1000);
+
+    document.getElementById('info-next').onclick = () => {
+      const n = document.getElementById('name').value.trim(),
+            p = document.getElementById('phone').value.trim(),
+            e = document.getElementById('email').value.trim();
+      if (!n || !p || !e) {
+        document.getElementById('info-error').style.display = 'block';
+        return;
       }
+
+      sessionStorage.setItem('buyerName', n);
+      sessionStorage.setItem('buyerPhone', p);
+      sessionStorage.setItem('buyerEmail', e);
+
+      // 그룹 B buyerInfo 저장 로컬스토리지 
+      const mapKey = 'buyerMapB';
+      const rawMap = localStorage.getItem(mapKey) || '{}';
+      let buyerMap;
+      try {
+        buyerMap = JSON.parse(rawMap);
+        if (typeof buyerMap !== 'object' || buyerMap === null) buyerMap = {};
+      } catch {
+        buyerMap = {};
+      }
+      // 이름을 userId로 간주해 맵에 저장
+      buyerMap[n] = n;
+      localStorage.setItem(mapKey, JSON.stringify(buyerMap));
+      localStorage.setItem('buyerIdB', n);
+
+      location.href = 'payment.html';
     };
   </script>
 </body>
