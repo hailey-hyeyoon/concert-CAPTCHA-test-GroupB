@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Confirmation & Ticket Details</title>
+  <title>Confirmation & Ticket Details (Group B)</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -51,6 +51,14 @@
       color: var(--text-primary);
       font-weight: 400;
     }
+    .notice {
+      background: #f8f9fa;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+    }
     .actions {
       text-align: center;
       padding: 1rem;
@@ -87,27 +95,37 @@
          <span class="value" id="total-time">0s</span>
       </p>
     </div>
+    <div class="notice">
+      📸 Please take a screenshot of the test result page, and send it to the researcher.<br>
+      You can view the test result page by clicking “Finish & View Results” button. <br> <br>
+      📸 테스트 결과 페이지를 스크린캡쳐하여 연구인에게 전송해주시길 바랍니다. <br>
+      테스트 결과 페이지는 하단의 “Finish & View Results” 버튼을 누르면 볼 수 있습니다. <br> <br>
+      📸 テスト結果のページをスクリーンショットして、研究者に送ってください。<br>「
+      終了して結果を表示」ボタンをクリックすると、テスト結果のページを見ることができます。
+    </div>
     <div class="actions">
-      <button id="finish-btn">Finish & Save</button>
+      <button id="finish-btn">Finish & View Results</button>
     </div>
   </div>
 
   <script>
-    // Populate fields from sessionStorage
+    // Populate fields from sessionStorage/localStorage
     document.getElementById('date-session').textContent =
       sessionStorage.getItem('concertDate') + ' / ' +
       sessionStorage.getItem('concertSession');
     document.getElementById('buyer-name').textContent =
-      sessionStorage.getItem('buyerName') || 'N/A';
+      localStorage.getItem('buyerIdB') || 'N/A';
     document.getElementById('payment-method').textContent =
       sessionStorage.getItem('paymentMethod') || 'N/A';
 
-    // Compute total elapsed time
+    // Compute elapsed time (from startTime stored in sessionStorage)
     const start = parseInt(sessionStorage.getItem('startTime'), 10);
-    const totalSec = Math.floor((Date.now() - start) / 1000);
-    document.getElementById('total-time').textContent = totalSec + 's';
+    const elapsed = start
+      ? Math.floor((Date.now() - start) / 1000)
+      : 0;
+    document.getElementById('total-time').textContent = elapsed + 's';
 
-    // Function to save to groupBResults
+    // Save to groupBResults and redirect to result.html
     function saveGroupBResult(userId, timeTaken, success) {
       const STORAGE_KEY = 'groupBResults';
       let arr;
@@ -120,7 +138,7 @@
       arr.push({
         userId,
         time: timeTaken,
-        attempts: 1,  // 그룹 B 는 시도 횟수가 항상 1
+        attempts: 1,
         success,
         timestamp: new Date().toISOString()
       });
@@ -128,16 +146,18 @@
     }
 
     document.getElementById('finish-btn').addEventListener('click', () => {
-      const userId    = localStorage.getItem('buyerIdB') || '';
-      const timeTaken = parseFloat(localStorage.getItem('captchaTime')) || 0;
-      const success   = localStorage.getItem('captchaSuccess') === 'true';
+      const userId  = localStorage.getItem('buyerIdB') || '';
+      const time    = parseInt(document.getElementById('total-time').textContent, 10) || 0;
+      const success = localStorage.getItem('captchaSuccess') === 'true';
 
       if (!userId) {
         alert('Buyer ID not found.');
         return;
       }
-      saveGroupBResult(userId, timeTaken, success);
-      alert('Results saved!');
+      saveGroupBResult(userId, time, success);
+
+      // Redirect to result page
+      window.location.href = 'result.html';
     });
   </script>
 </body>
