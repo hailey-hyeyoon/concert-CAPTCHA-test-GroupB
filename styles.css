@@ -1,0 +1,110 @@
+:root {
+  --theme: #762922;
+  --bg: #fafafa;
+  --panel-bg: #fff;
+  --border: #ddd;
+  --text: #333;
+  --light-text: #666;
+  --error: #e53e3e;
+  --font: 'Roboto', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text);
+}
+
+header {
+  background: var(--theme);
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: 2rem auto;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.section {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: var(--theme);
+}
+
+.section-content {
+  font-size: 0.95rem;
+  color: var(--light-text);
+  line-height: 1.5;
+}
+
+.consent-actions {
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.consent-actions label {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  margin-right: auto;
+}
+
+.consent-actions input {
+  margin-right: 0.5rem;
+}
+
+.consent-actions button {
+  background: var(--theme);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.consent-actions button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.timer {
+  position: absolute;
+  top: 1rem;
+  right: 2rem;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.errors {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: none;
+}

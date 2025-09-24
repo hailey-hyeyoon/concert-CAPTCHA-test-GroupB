@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticket Quantity</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --theme: #762922;
+      --panel-bg: #fff;
+      --border: #ddd;
+      --text-primary: #333;
+      --text-secondary: #666;
+    }
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: var(--panel-bg);
+      color: var(--text-primary);
+    }
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 2rem auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .header {
+      background: var(--theme);
+      color: #fff;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header .section-title {
+      font-weight: 700;
+    }
+    .table-wrap {
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-top: 1px solid var(--border);
+      font-size: 0.95rem;
+    }
+    th {
+      background: #f9f9f9;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .price-cell {
+      text-align: right;
+      font-weight: 500;
+      color: var(--theme);
+    }
+    td select {
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--text-primary);
+    }
+    .actions {
+      padding: 1rem;
+      text-align: right;
+      background: #fafafa;
+      border-top: 1px solid var(--border);
+    }
+    .actions button {
+      background: var(--theme);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .actions button:hover {
+      background: #5a1c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="section-title">Price / General | Seats <span id="selected-count">0</span> selected</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Base Price</th>
+            <th>Description</th>
+            <th class="price-cell">154,000 KRW</th>
+            <th>Quantity</th>
+            <th>
+              <select id="qty-select">
+                <option value="0">0</option>
+                <option value="1">1</option>
+              </select>
+            </th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <div class="actions">
+      <button id="qty-next">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const qtySelect = document.getElementById('qty-select');
+    const selCount = document.getElementById('selected-count');
+
+    qtySelect.addEventListener('change', () => {
+      selCount.textContent = qtySelect.value;
+    });
+
+    document.getElementById('qty-next').addEventListener('click', () => {
+      const n = parseInt(qtySelect.value, 10);
+      if (n === 0) {
+        alert('Please select 1 ticket to proceed.');
+      } else {
+        sessionStorage.setItem('quantity', n);
+        location.href = 'buyer-info.html';
+      }
+    });
+  </script>
+</body>
+</html>

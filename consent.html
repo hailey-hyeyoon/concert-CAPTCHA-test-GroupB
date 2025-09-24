@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CAPTCHA Ticketing Study</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { position: relative; }
+  </style>
+</head>
+<body>
+  <header>
+    Concert Ticketing CAPTCHA Study
+  </header>
+  <div class="container">
+    <div class="section">
+      <div class="section-title">Study Purpose / 연구 목적 / 研究目的</div>
+      <div class="section-content">
+        Examining how different CAPTCHA implementations affect user experience during a concert ticket purchase flow.<br>
+        콘서트 티켓 구매 흐름에서 다양한 CAPTCHA 구현이 사용자 경험에 미치는 영향 분석.<br>
+        コンサートチケット購入フローにおけるさまざまなCAPTCHAの実装がユーザーエクスペリエンスに与える影響の分析。
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Procedure / 절차 설명 / 手順説明</div>
+      <div class="section-content">
+        You will complete a simulated ticket purchase in four steps.<br>
+        4단계 시뮬레이션 티켓 구매 진행.<br>
+        4ステップのシミュレーションチケット購入を実施.<br>
+        Estimated time: about 10 minutes.
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Privacy & Data Use</div>
+      <div class="section-content">
+        All data is anonymous and used only for this study.
+      </div>
+    </div>
+    <form id="consent-form" class="consent-actions">
+      <label>
+        <input type="checkbox" id="agree" required>
+        I agree to participate in this study.
+      </label>
+      <button type="submit" id="continue-btn" disabled>Continue</button>
+    </form>
+  </div>
+
+  <script>
+
+    // Consent
+    const agree = document.getElementById('agree');
+    const btn = document.getElementById('continue-btn');
+    agree.addEventListener('change', () => btn.disabled = !agree.checked);
+
+    document.getElementById('consent-form').onsubmit = e => {
+      e.preventDefault();
+      location.href = 'select-date.html';
+    };
+  </script>
+</body>
+</html>

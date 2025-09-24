@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Seat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: var(--bg);
+    }
+    header {
+      background: var(--theme);
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+    #timer {
+      font-size: 0.9rem;
+    }
+    .container {
+      width: 90%;
+      max-width: 900px;
+      margin: 2rem auto;
+    }
+    .seat-legend {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    .seat-legend div {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .taken-box {
+      width: 16px; height: 16px;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .available-box {
+      width: 16px; height: 16px;
+      background: rgba(118,41,34,0.3);
+      border-radius: 2px;
+    }
+    .selected-box {
+      width: 16px; height: 16px;
+      background: var(--theme);
+      border-radius: 2px;
+    }
+    #seat-map {
+      display: grid;
+      grid-template-columns: repeat(20, 16px);
+      gap: 2px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--panel-bg);
+      justify-content: center;
+    }
+    .seat {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+    .seat.taken {
+      background: #f0f0f0;
+      cursor: not-allowed;
+    }
+    .seat.available {
+      background: rgba(118,41,34,0.3);
+    }
+    .seat.available:hover {
+      background: rgba(118,41,34,0.5);
+    }
+    .seat.selected {
+      background: var(--theme);
+    }
+    .errors {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    .consent-actions {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    .consent-actions button {
+      padding: 0.75rem 2rem;
+      background: var(--theme);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Select Your Seat
+    <div id="timer">Time: 0s</div>
+  </header>
+
+  <div class="container">
+    <div class="seat-legend">
+      <div><div class="taken-box"></div><span>Taken</span></div>
+      <div><div class="available-box"></div><span>Available</span></div>
+      <div><div class="selected-box"></div><span>Selected</span></div>
+    </div>
+
+    <div id="seat-map"></div>
+    <div class="errors" id="seat-error">Please select a seat.</div>
+
+    <div class="consent-actions">
+      <button id="seat-next">Next</button>
+    </div>
+  </div>
+
+  <script>
+    // Initialize timer start on first load
+    if (!sessionStorage.getItem('startTime')) {
+      sessionStorage.setItem('startTime', Date.now());
+    }
+    // Update timer display
+    setInterval(() => {
+      const start = parseInt(sessionStorage.getItem('startTime'), 10);
+      const seconds = Math.floor((Date.now() - start) / 1000);
+      document.getElementById('timer').textContent = `Time: ${seconds}s`;
+    }, 1000);
+
+    const TOTAL = 400;
+    let available = new Set();
+    let selected = null;
+    let refreshCount = 0;
+    let refreshTimer;
+
+    function weightedSample(arr, count, weightFn) {
+      const items = arr.map(i => ({ i, w: weightFn(i) }));
+      const result = [];
+      for (let k = 0; k < count && items.length; k++) {
+        const sum = items.reduce((s, e) => s + e.w, 0);
+        let r = Math.random() * sum;
+        for (let j = 0; j < items.length; j++) {
+          r -= items[j].w;
+          if (r <= 0) {
+            result.push(items[j].i);
+            items.splice(j, 1);
+            break;
+          }
+        }
+      }
+      return result;
+    }
+
+    function initSeats() {
+      const all = Array.from({ length: TOTAL }, (_, i) => i);
+      const sampled = weightedSample(all, 100, i => (i >= TOTAL/2 ? 2 : 1));
+      sampled.forEach(i => available.add(i));
+      renderSeats();
+    }
+
+    function refreshSeats() {
+      refreshCount++;
+      if (refreshCount > 2) {
+        for (let i = 0; i < 120; i++) {
+          available.delete(i);
+          if (selected === i) selected = null;
+        }
+      }
+      const arr = Array.from(available);
+      if (arr.length > 5) {
+        const removeCount = Math.min(10, arr.length - 5);
+        const sampled = weightedSample(arr, removeCount, i => (i < TOTAL/2 ? 2 : 1));
+        sampled.forEach(i => {
+          available.delete(i);
+          if (selected === i) selected = null;
+        });
+      } else {
+        // Shuffle exactly 5 seats
+        const allSeats = Array.from({ length: TOTAL }, (_, i) => i);
+        const new5 = weightedSample(allSeats, 5, () => 1);
+        available.clear();
+        new5.forEach(i => available.add(i));
+        if (!available.has(selected)) selected = null;
+      }
+      renderSeats();
+    }
+
+    function startRefresh() {
+      clearInterval(refreshTimer);
+      const interval = available.size > 5 ? 800 : 1500;
+      refreshTimer = setInterval(refreshSeats, interval);
+    }
+
+    function renderSeats() {
+      const map = document.getElementById('seat-map');
+      map.innerHTML = '';
+      for (let i = 0; i < TOTAL; i++) {
+        const div = document.createElement('div');
+        div.className = 'seat ' +
+          (i === selected ? 'selected' :
+           available.has(i) ? 'available' :
+           'taken');
+        div.onclick = () => {
+          if (!available.has(i) && i !== selected) {
+            alert('This seat is already taken. Please choose another.');
+            return;
+          }
+          if (selected !== null) available.add(selected);
+          if (selected === i) {
+            selected = null;
+          } else {
+            selected = i;
+            available.delete(i);
+          }
+          renderSeats();
+        };
+        map.appendChild(div);
+      }
+      startRefresh();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initSeats();
+      startRefresh();
+      document.getElementById('seat-next').onclick = () => {
+        if (selected === null) {
+          document.getElementById('seat-error').style.display = 'block';
+        } else {
+          sessionStorage.setItem('seat', selected + 1);
+          location.href = 'ticket-quantity.html';
+        }
+      };
+    });
+  </script>
+</body>
+</html>

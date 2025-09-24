@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .payment-options { display: flex; gap:1rem; margin-top:1rem; }
+    .payment-item {
+      flex:1; padding:1rem; text-align:center; border:1px solid var(--border); border-radius:4px; cursor:pointer;
+      transition:border-color 0.2s,background 0.2s;
+    }
+    .payment-item.selected { border-color:var(--theme); background:var(--theme); color:#fff; }
+  </style>
+</head>
+<body>
+  <header>
+    Payment Method
+    <div class="timer" id="timer">Time: 0s</div>
+  </header>
+  <div class="container">
+    <div class="section">
+      <div class="section-title">Select Payment</div>
+      <div class="payment-options">
+        <div class="payment-item" data-pay="Apple Pay">Apple Pay</div>
+        <div class="payment-item" data-pay="PayPal">PayPal</div>
+        <div class="payment-item" data-pay="Card">Card Payment</div>
+      </div>
+      <div class="errors" id="pay-error">Please select a payment method.</div>
+    </div>
+    <div class="consent-actions">
+      <button id="pay-next">Confirm Payment</button>
+    </div>
+  </div>
+  <script>
+    setInterval(()=>document.getElementById('timer').textContent=`Time: ${Math.floor((Date.now()-+sessionStorage.getItem('startTime'))/1000)}s`,1000);
+    let pay=null;
+    document.querySelectorAll('.payment-item').forEach(el=>{
+      el.onclick=()=>{
+        document.querySelectorAll('.payment-item.selected').forEach(x=>x.classList.remove('selected'));
+        el.classList.add('selected'); pay=el.dataset.pay; document.getElementById('pay-error').style.display='none';
+      };
+    });
+    document.getElementById('pay-next').onclick=()=>{
+      if(!pay) document.getElementById('pay-error').style.display='block';
+      else{sessionStorage.setItem('paymentMethod',pay);location.href='confirmation.html';}
+    };
+  </script>
+</body>
+</html>

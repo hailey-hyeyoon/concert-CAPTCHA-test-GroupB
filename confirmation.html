@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmation & Ticket Details</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --theme: #762922;
+      --panel-bg: #fff;
+      --border: #ddd;
+      --text-primary: #333;
+      --text-secondary: #666;
+    }
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: var(--panel-bg);
+      color: var(--text-primary);
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      margin: 2rem auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    header {
+      background: var(--theme);
+      color: #fff;
+      padding: 1rem;
+      font-size: 1.25rem;
+      font-weight: 500;
+      text-align: center;
+    }
+    .details {
+      padding: 1.5rem;
+    }
+    .details p {
+      margin: 0.75rem 0;
+      font-size: 1rem;
+    }
+    .details p span.label {
+      display: inline-block;
+      width: 120px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .details p span.value {
+      color: var(--text-primary);
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>Confirmation & Ticket Details</header>
+    <div class="details">
+      <p><span class="label">Concert:</span>
+         <span class="value">2025 ＆TEAM CONCERT TOUR ‘AWAKEN THE BLOODLINE’</span>
+      </p>
+      <p><span class="label">Date &amp; Session:</span>
+         <span class="value" id="date-session"></span>
+      </p>
+      <p><span class="label">Buyer:</span>
+         <span class="value" id="buyer-name"></span>
+      </p>
+      <p><span class="label">Payment:</span>
+         <span class="value" id="payment-method"></span>
+      </p>
+      <p><span class="label">Total Time:</span>
+         <span class="value" id="total-time">0s</span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Populate fields from sessionStorage
+    document.getElementById('date-session').textContent =
+      sessionStorage.getItem('concertDate') + ' / ' +
+      sessionStorage.getItem('concertSession');
+    document.getElementById('buyer-name').textContent =
+      sessionStorage.getItem('buyerName') || 'N/A';
+    document.getElementById('payment-method').textContent =
+      sessionStorage.getItem('paymentMethod') || 'N/A';
+
+    // Compute total elapsed time
+    const start = parseInt(sessionStorage.getItem('startTime'), 10);
+    const totalSec = Math.floor((Date.now() - start) / 1000);
+    document.getElementById('total-time').textContent = totalSec + 's';
+  </script>
+</body>
+</html>

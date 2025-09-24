@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://www.google.com/recaptcha/api.js?render=6LegMdMrAAAAAC4bp_dT0igxl1ZINPz9cxPWvBQm"></script>
+  <meta charset="UTF-8">
+  <title>Select Date & Session</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { margin: 0; font-family: 'Roboto', sans-serif; background: var(--bg); }
+    header {
+      background: var(--theme); color: #fff;
+      padding: 1rem 2rem; font-size: 1.2rem; font-weight: 500;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .timer { font-size: 0.9rem; }
+    .container { display: flex; width: 90%; max-width: 900px; margin: 2rem auto; }
+    .info-panel, .calendar-panel {
+      background: var(--panel-bg); border: 1px solid var(--border); border-radius: 4px;
+      padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .info-panel { flex: 1; margin-right: 1rem; }
+    .calendar-panel { flex: 1; }
+    .info-poster { width: 100%; border-radius: 4px; margin-bottom: 1rem; }
+    .info-item {
+      font-size: 1rem; color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .date-grid {
+      display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
+      margin-top: 1rem;
+    }
+    .date-cell {
+      padding: 0.75rem; text-align: center;
+      border: 1px solid var(--border); border-radius: 4px;
+      cursor: pointer; background: var(--panel-bg);
+      transition: background 0.2s, color 0.2s;
+    }
+    .date-cell.disabled { background: #f0f0f0; color: #ccc; cursor: default; }
+    .date-cell.selected { background: var(--theme); color: #fff; }
+    .session-panel { margin-top: 1.5rem; text-align: center; }
+    .session-button {
+      display: inline-block; padding: 0.75rem 1.5rem;
+      border: 1px solid var(--theme); border-radius: 4px;
+      color: var(--theme); cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .session-button.selected {
+      background: var(--theme); color: #fff;
+    }
+    button {
+      margin-top: 1.5rem; width: 100%; padding: 0.75rem;
+      background: var(--theme); color: #fff; border: none; border-radius: 4px;
+      font-size: 1rem; cursor: pointer;
+    }
+    .errors { color: var(--error); font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    Select Date & Session
+    <div class="timer" id="timer">Time: 0s</div>
+  </header>
+
+  <div class="container">
+    <div class="info-panel">
+      <img class="info-poster" src="25004476_p.jpg" alt="Concert Poster">
+      <div class="info-item">📍 TOKYO DOME</div>
+      <div class="info-item">🗓️ 2025.12.24 ~ 2025.12.25</div>
+      <div class="info-item">⏳ 120 Min</div>
+    </div>
+
+    <div class="calendar-panel">
+      <div class="section-title" style="font-size:1rem;font-weight:500;color:var(--text-primary);">December 2025</div>
+      <div class="date-grid" id="date-grid"></div>
+      <div class="errors" id="date-error">Please select a date first.</div>
+
+      <div class="session-panel">
+        <div id="session-btn" class="session-button">20:00</div>
+        <div class="errors" id="session-error">Please select a date before choosing a session.</div>
+      </div>
+
+      <button id="next-btn">Next</button>
+    </div>
+  </div>
+
+  <script>
+    // Initialize startTime once
+if (!sessionStorage.getItem('startTime')) {
+  sessionStorage.setItem('startTime', Date.now());
+}
+
+    // Timer
+    setInterval(() => {
+      const start = parseInt(sessionStorage.getItem('startTime') || Date.now(), 10);
+      const diff = Math.floor((Date.now() - start) / 1000);
+      document.getElementById('timer').textContent = `Time: ${diff}s`;
+    }, 1000);
+
+    // Date grid
+    const allowed = [24, 25];
+    let selDate = null, selSession = null;
+    const grid = document.getElementById('date-grid');
+    for (let d = 1; d <= 31; d++) {
+      const cell = document.createElement('div');
+      cell.textContent = d;
+      cell.className = 'date-cell ' + (allowed.includes(d) ? '' : 'disabled');
+      if (allowed.includes(d)) {
+        cell.addEventListener('click', () => {
+          // select date
+          document.querySelectorAll('.date-cell.selected')
+            .forEach(x => x.classList.remove('selected'));
+          cell.classList.add('selected');
+          selDate = d;
+          document.getElementById('date-error').style.display = 'none';
+        });
+      }
+      grid.append(cell);
+    }
+
+    // Session button only works after date selected
+    const sbtn = document.getElementById('session-btn');
+    sbtn.addEventListener('click', () => {
+      if (!selDate) {
+        document.getElementById('date-error').style.display = 'block';
+        return;
+      }
+      selSession = '20:00';
+      sbtn.classList.add('selected');
+      document.getElementById('session-error').style.display = 'none';
+    });
+
+    // Next
+    document.getElementById('next-btn').addEventListener('click', () => {
+      if (!selDate) {
+        document.getElementById('date-error').style.display = 'block';
+      } else if (!selSession) {
+        document.getElementById('session-error').style.display = 'block';
+      } else {
+        sessionStorage.setItem('concertDate', `2025-12-${selDate}`);
+        sessionStorage.setItem('concertSession', selSession);
+        location.href = 'select-seat.html';
+      }
+    });
+  </script>
+</body>
+</html>
